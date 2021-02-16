@@ -1,0 +1,25 @@
+CREATE
+ (NAmerica:Location {name:'North America', type:'continent'}),
+ (USA:Location {name:'United States', type:'country' }),
+ (Idaho:Location {name:'Idaho', type:'state' }),
+
+ (Europe:Location {name:'Europe', type:'continent'}),
+ (UK:Location {name:'United Kingdom', type:'country' }),
+ (France:Location {name:'France', type:'country' }),
+ (England:Location {name:'England', type:'country' }),
+ (London:Location {name:'London', type:'city' }),
+ (Burgundy:Location {name_fr:'Bourgogne', name_en: 'Burgundy', name: 'Burgundy', type:'region' }),
+ (CD:Location {name:'Côte d\'Ivoire', type:'department' }),
+ (Beaune:Location {name:'Beaune', type:'city' }),
+
+ (Lucy:Person {name:'Lucy'}),
+ (Alain:Person {name:'Alain'}),
+
+ (Beaune) -[:WITHIN]-> (CD) -[:WITHIN]-> (Burgundy) -[:WITHIN]-> (France) -[:WITHIN]-> (Europe),
+ (London) -[:WITHIN]-> (England) -[:WITHIN]-> (UK) -[:WITHIN]-> (Europe),
+ (Idaho)  -[:WITHIN]-> (USA) -[:WITHIN]-> (NAmerica),
+
+ (Lucy) -[:BORN_IN]-> (Idaho),
+ (Lucy) -[:LIVES_IN]-> (London),
+ (Alain) -[:BORN_IN]-> (Beaune),
+ (Alain) -[:LIVES_IN]-> (London)

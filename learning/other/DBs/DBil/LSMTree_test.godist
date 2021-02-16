@@ -1,0 +1,66 @@
+package DBil
+
+import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"go_sendbox/learning/other/DBs/DBil/strategy/lsm_tree"
+	"testing"
+	"time"
+)
+
+var lsmDB = NewLSMTreeBasedDB()
+
+func TestSave(t *testing.T) {
+	_ = lsmDB.Clean()
+	k, v := fillFixtures(t, lsmDB)
+	assert.Equal(t, v, *lsmDB.Get(k))
+}
+
+func TestMergeFiles(t *testing.T) {
+	db := &DBil{
+		strategy:     lsm_tree.NewLSMTree(filesStorage, 1),
+		filesStorage: filesStorage,
+		bloomFilter:  bloomFilter,
+	}
+	_ = db.Clean()
+	var lastValue string
+	for i := 0; i < 1011; i++ {
+		lastValue = fmt.Sprintf("%d", time.Now().UnixNano())
+		err := db.Save("key", lastValue)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	db.MergeFiles()
+	assert.Equal(t, lastValue, *db.Get("key"))
+}
+
+func TestIndex(t *testing.T) {
+	db := &DBil{
+		strategy:     lsm_tree.NewLSMTree(filesStorage, 10),
+		filesStorage: filesStorage,
+		bloomFilter:  bloomFilter,
+	}
+	_ = db.Clean()
+	_ = db.Save("zk_3", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("l_5", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("gh", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("apo", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("i7", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("lok", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("zgg", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("amm", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("c55", fmt.Sprintf("%d", time.Now().UnixNano()))
+	_ = db.Save("a00", fmt.Sprintf("%d", time.Now().UnixNano()))
+
+	startNotIndexed := time.Now()
+	_ = db.Get("zk_3")
+	finishNotIndexed := time.Since(startNotIndexed).Microseconds()
+	_ = db.Index()
+	startIndexed := time.Now()
+	_ = db.Get("zk_3")
+	finishIndexed := time.Since(startIndexed).Microseconds()
+
+	assert.Less(t, finishIndexed, finishNotIndexed)
+
+}

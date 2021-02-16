@@ -1,0 +1,4 @@
+# AWS Settings
+aws_access_key = "KEY"
+aws_secret_key = "SECRET"
+aws_region     = "REGION"

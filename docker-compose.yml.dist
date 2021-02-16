@@ -1,0 +1,50 @@
+version: "3"
+services:
+
+  golang:
+    image: erema/golang:latest
+    depends_on:
+      - mysql
+      - neo4j
+    tty: true
+    volumes:
+    - ./:/var/go_sendbox
+    working_dir: /var/go_sendbox
+
+  mysql:
+    image: mysql:8.0.19
+    environment:
+      MYSQL_DATABASE: go
+      MYSQL_ROOT_PASSWORD: 123
+    ports:
+      - 3306:3306
+
+  neo4j:
+    image: neo4j:latest
+    environment:
+      NEO4J_AUTH: neo4j/123
+    ports:
+      - 7474:7474
+      - 7687:7687
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: go
+      POSTGRES_USER: go
+      POSTGRES_PASSWORD: 123
+    ports:
+      - 5432:5432
+
+  aws-cli:
+    image: amazon/aws-cli:latest
+    entrypoint: tail -f /dev/null
+    tty: true
+
+  terraform:
+    image: hashicorp/terraform:latest
+    entrypoint: tail -f /dev/null
+    volumes:
+    - ./learning/other/aws_api_gateway_lambda_terraform:/aws_api_gateway_lambda_terraform
+    working_dir: /aws_api_gateway_lambda_terraform
+    tty: true

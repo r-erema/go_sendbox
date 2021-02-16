@@ -1,0 +1,28 @@
+package DBil
+
+import (
+	"fmt"
+	"testing"
+	"time"
+)
+
+func fillFixtures(t *testing.T, db *DBil) (searchableKey, searchableValue string) {
+	for i := 0; i < 753; i++ {
+		err := db.Save(fmt.Sprintf("key%d", i), fmt.Sprintf("value %d", i))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	searchableKey, searchableValue = fmt.Sprintf("key%d", time.Now().UnixNano()), fmt.Sprintf("value%d", time.Now().UnixNano())
+	err := db.Save(searchableKey, searchableValue)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 1000; i < 1257; i++ {
+		err := db.Save(fmt.Sprintf("key%d", i), fmt.Sprintf("value %d", i))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	return
+}

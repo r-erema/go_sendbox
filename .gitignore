@@ -1,0 +1,7 @@
+.idea
+.terraform
+terraform.tvars
+vendor
+docker-compose.yml
+learning/other/DBs/DBil/mem_table/data
+learning/other/DBs/DBil/data

@@ -1,0 +1,65 @@
+package DBil
+
+import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"testing"
+	"time"
+)
+
+var hashTableDb = NewHashTableDB()
+
+func TestGet(t *testing.T) {
+	_ = hashTableDb.Clean()
+	key, value := fillFixtures(t, hashTableDb)
+	assert.Equal(t, value, *hashTableDb.Get(key))
+}
+
+func TestCompareIndexedVsNotIndexedRead(t *testing.T) {
+	_ = hashTableDb.Clean()
+	key, value := fillFixtures(t, hashTableDb)
+
+	startNotIndexed := time.Now()
+	found := *hashTableDb.Get(key)
+	finishNotIndexed := time.Since(startNotIndexed).Microseconds()
+	assert.Equal(t, value, found)
+
+	_ = hashTableDb.Index()
+
+	startIndexed := time.Now()
+	found = *hashTableDb.Get(key)
+	finishIndexed := time.Since(startIndexed).Microseconds()
+	assert.Equal(t, value, found)
+
+	assert.Less(t, finishIndexed, finishNotIndexed)
+}
+
+func TestMultipleDataFiles(t *testing.T) {
+	_ = hashTableDb.Clean()
+	fillFixtures(t, hashTableDb)
+	assert.Equal(t, 2, len(hashTableDb.filesStorage.Files()))
+}
+
+func TestSameKey(t *testing.T) {
+	_ = hashTableDb.Clean()
+	key, _ := fillFixtures(t, hashTableDb)
+	lastValue := fmt.Sprintf("%d", time.Now().UnixNano())
+	_ = hashTableDb.Save(key, lastValue)
+	assert.Equal(t, lastValue, *hashTableDb.Get(key))
+}
+
+func TestCompaction(t *testing.T) {
+	_ = hashTableDb.Clean()
+	for i := 0; i <= 5000; i++ {
+		_ = hashTableDb.Save("firstKey", fmt.Sprintf("%d", i))
+		_ = hashTableDb.Save("secondKey", fmt.Sprintf("%d", i+1))
+		_ = hashTableDb.Save("thirdKey", fmt.Sprintf("%d", i+2))
+	}
+	_ = hashTableDb.Compaction()
+
+	assert.Equal(t, 1, len(hashTableDb.filesStorage.Files()))
+	assert.Equal(t, "5000", *hashTableDb.Get("firstKey"))
+	assert.Equal(t, "5001", *hashTableDb.Get("secondKey"))
+	assert.Equal(t, "5002", *hashTableDb.Get("thirdKey"))
+
+}
