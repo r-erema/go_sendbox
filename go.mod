@@ -13,7 +13,6 @@ require (
 	github.com/lib/pq v1.7.0
 	github.com/mailru/easyjson v0.7.1
 	github.com/mattn/go-sqlite3 v1.13.0
-	github.com/neo4j-drivers/gobolt v1.7.4 // indirect
 	github.com/neo4j/neo4j-go-driver v1.7.4
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
